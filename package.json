@@ -4,7 +4,7 @@
   "description": "Front End для jsdoc. Позволяет использовать jsdoc в режиме LiveEdit",
   "keywords": [],
   "main": "./main.js",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "author": "dimkl",
   "scripts": {
     "start": "electron ."
@@ -19,6 +19,15 @@
     "jsdoclive": "bin/jsdoclive"
   },
   "devDependencies": {},
-  "license": "GPL-3.0-or-later"
+  "license": "GPL-3.0-or-later",
+
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dimkl-dev/JSDocLive.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dimkl-dev/JSDocLive/issues"
+  },
+  "homepage": "https://github.com/dimkl-dev/JSDocLive#readme"
 
 }
