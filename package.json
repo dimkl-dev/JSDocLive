@@ -1,0 +1,24 @@
+{
+  "name": "jsdoclive",
+  "productName": "JSDocLive",
+  "description": "Front End для jsdoc. Позволяет использовать jsdoc в режиме LiveEdit",
+  "keywords": [],
+  "main": "./main.js",
+  "version": "0.9.1",
+  "author": "dimkl",
+  "scripts": {
+    "start": "electron ."
+  },
+  "dependencies": {
+    "electron": "^26.2.2",
+    "gulp": "4.0.2",
+    "jsdoc": "^4.0.2",
+    "poolcall": "^1.0.0"
+  },
+  "bin": {
+    "jsdoclive": "bin/jsdoclive"
+  },
+  "devDependencies": {},
+  "license": "GPL-3.0-or-later"
+
+}

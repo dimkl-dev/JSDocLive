@@ -1,0 +1,112 @@
+#!/usr/bin/env node
+const fs = require('fs');
+const { argv } = require('process');
+const spawn = require('child_process').spawn;
+const {execFile}  = require('child_process');
+const path = require('node:path') ;
+const electron_bin = require('electron');
+//const electron_bin = module.path + '/../node_modules/.bin/electron';
+console.log('====debug====');
+console.dir(electron_bin);
+console.log('=====end debug===');
+
+/**
+ * Объект, содержащий данные, которые потребны порождаемым даллее процессам
+ * @typedef {Object} JSDocLive~jsdoc
+ * @property {Array} jsdocparam - паремтры для jsdoc. Принимаются из команднойстроки при вызове JSDocLive. Будут переданы в любом случаае. По умолчанию ожидаются параметры для JSDoc.
+ * @property {String} electron_root - путь до корня пакета 
+ * @property {String} electron_bin - путь до бинарного файла electron
+ * @property {Array} electron_param - параметры для запуска бинарного файла electron.
+ * @property {String} callpath -  путь к папке, из которой был произведён вызов  JSDocLive
+ * @property {String} protocol - часть url элемента iframe
+ * @property {String} host - часть url элемента iframe 
+ * @property {JSDocLive~jsdoclive_config} jsdoclive_config - настройки из файла jsdoclive.json. Считывается только 
+ * в том случаее - если файл находится в каталоге, из которго происходит вызов jsdoclive.
+ * @property {String} [prefix="out"] - каталог, в котором будет результат работы jsdoc. Берётся значение
+ * по умолчанию, или значене после параметра командной строки "-d", или значение праметра "output_res" 
+ * из файла jsdoclive.json
+ * @property {Function} update_jsdoclive_config - обновляет настройки из файла jsdoclive.json
+ * @property {String} [exec_cmd] - под большим вопросом. Должно было находится значение из jsdoc.jsdoclive_config.exec_cmd
+ 
+ */
+
+/**@type {JSDocLive~jsdoc} */
+let jsdoc = {};
+jsdoc.jsdocparam = process.argv.slice(2);
+jsdoc.electron_root = path.resolve(module.path+"/../");
+jsdoc.callpath =  path.resolve(".");
+jsdoc.protocol = 'file';
+jsdoc.host='';
+
+
+/**
+ * Читаем файл настроек. Файл настроек задаётся в папке  из которой вызывается 
+ * @typedef {Object} JSDocLive~jsdoclive_config
+ * @property {String} [exec_cmd] - выполняема команда 
+ * @property {String} [output_res] - папка с результатом работы команды
+ * @property {String} [first_args] - которые будут добавлены в начало списка параметров  выполняемой команде 
+ * @property {String} [last_args] - которые будут добавлены в конец списка параметров  выполняемой команде
+ * @property {Boolean}[delete_to_end=true] - если false - то пака, откуда jsdoclive берёт данные для отображения, будет оставлена после закрытия приложения.
+ */
+
+//--start function
+jsdoc.update_jsdoclive_config = function (){
+/**@type {JSDocLive~jsdoclive_config} */
+var jsdoclive_config ={};
+try {
+jsdoclive_config = require('fs').readFileSync(path.join(this.callpath, 'jsdoclive.json'));
+jsdoclive_config = JSON.parse(jsdoclive_config);
+} catch(e){jsdoclive_config = {}};
+
+
+jsdoclive_config.exec_cmd = jsdoclive_config.exec_cmd || undefined;
+jsdoclive_config.output_res = jsdoclive_config.output_res || undefined;
+jsdoclive_config.first_args = jsdoclive_config.first_args || undefined;
+jsdoclive_config.last_args = jsdoclive_config.last_args || undefined;
+var __fl__ = jsdoclive_config.delete_to_end;
+
+
+jsdoclive_config.delete_to_end = (typeof __fl__) == 'boolean' ? __fl__ : true;
+/////////////////////
+this.jsdoclive_config = jsdoclive_config;
+
+//-----Определяем префикс
+this.prefix = (()=>{
+    let jsdocparam = this.jsdocparam; /**@type {Array} */
+    let _fl = "out";
+    let ind = jsdocparam.indexOf("-d");
+    if (ind >= 0){_fl =  jsdocparam[ind+1]};
+    //if (jsdoclive_config){_fl = jsdoclive_config.output_res ? jsdoclive_config.output_res : _fl};
+    _fl = jsdoclive_config.output_res ? jsdoclive_config.output_res : _fl
+    return _fl;    
+})();
+
+try {//TODO ПРОВЕРИТЬ 
+    if (jsdoclive_config.exec_cmd){
+        this.exec_cmd = jsdoclive_config.exec_cmd;
+    }
+} catch(e){};
+////////////////////////////
+}//--end function
+
+jsdoc.update_jsdoclive_config();
+jsdoc.update_jsdoclive_config = jsdoc.update_jsdoclive_config.toString();
+/** Парарметры запуска nw*/
+jsdoc.electron_param =[];
+//jsdoc.electron_param.push("--inspect-brk=5858");
+//jsdoc.electron_param.push("--remote-debugging-port=9222");
+//jsdoc.electron_param.push("--disable-features=ProcessPerSiteUpToMainFrameThreshold");
+jsdoc.electron_bin = electron_bin;
+//------end param---------
+
+//console.dir(jsdoc);
+
+let args = ['.'].concat([JSON.stringify(jsdoc)], jsdoc.electron_param);
+
+//console.dir(args);
+let opt = {};
+opt.cwd=jsdoc.electron_root;
+opt.stdio = 'inherit';
+//opt.detached=true;
+spawn(electron_bin, args, opt)/*.unref()*/;
+
