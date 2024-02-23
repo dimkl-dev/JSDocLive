@@ -4,7 +4,7 @@
   "description": "Front End для jsdoc. Позволяет использовать jsdoc в режиме LiveEdit",
   "keywords": [],
   "main": "./main.js",
-  "version": "0.9.3",
+  "version": "0.9.4",
   "author": "dimkl",
   "scripts": {
     "start": "electron ."
